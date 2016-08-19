@@ -3,8 +3,10 @@ import sys, os, shutil, filecmp
 try:
     import dropbox
 except ImportError:
-    print("Error: Dropbox API not installed. Install with \"pip install dropbox\".")
+    print("Error: Dropbox API not installed. Install with \"pip3 install dropbox\".")
     sys.exit()
+
+ACCESS_TOKEN_FILE = "./access_token.txt"
     
 def sync(sync_file_path, dbx_sync_folder_path):
     """ Given a file containing paths to files to sync and a sync folder in Dropbox to sync into, syncs the files.
@@ -45,7 +47,10 @@ def get_access_token():
 
     @return str
     """
-    return "oe7pZ5UifyYAAAAAAAADeqFkKZKcsU-K4_9_NLrvxGqlKiDwEbtpauaDWiMwKpJx"
+    with open(ACCESS_TOKEN_FILE, "r") as f:
+        token = f.readline()
+
+    return token
 
 def files_to_sync(sync_file):
     """ Given a text file containing paths to files to sync, loads the appropriate files.
