@@ -6,7 +6,7 @@ except ImportError:
     print("Error: Dropbox API not installed. Install with \"pip3 install dropbox\".")
     sys.exit()
 
-ACCESS_TOKEN_FILE = "./access_token.txt"
+ACCESS_TOKEN_FILE = "/home/piyush/Documents/Files/projects/File-Syncer/dropbox_sync/access_token.txt"
     
 def sync(sync_file_path, dbx_sync_folder_path):
     """ Given a file containing paths to files to sync and a sync folder in Dropbox to sync into, syncs the files.
@@ -28,15 +28,18 @@ def sync(sync_file_path, dbx_sync_folder_path):
             f = open(file_path, "rb")
             file_name = file_path.split("/")[-1]
 
-            if file_name in dbx_files:
-                local_path = os.path.join(temp_dir_name, file_name)
-                dbx.files_download_to_file(local_path, dbx_files[file_name])
-                
-                if not filecmp.cmp(local_path, file_path):
-                    dbx.files_delete(dbx_files[file_name])
-                    dbx.files_upload(f, dbx_files[file_name])
-            else:
-                dbx.files_upload(f, "%s/%s" % (dbx_sync_folder_path, file_name))
+            try:
+                if file_name in dbx_files:
+                    local_path = os.path.join(temp_dir_name, file_name)
+                    dbx.files_download_to_file(local_path, dbx_files[file_name])
+                    
+                    if not filecmp.cmp(local_path, file_path):
+                        dbx.files_delete(dbx_files[file_name])
+                        dbx.files_upload(f, dbx_files[file_name])
+                else:
+                    dbx.files_upload(f, "%s/%s" % (dbx_sync_folder_path, file_name))
+            except Exception as e:
+                print("Dropbox: Got exception \"%s\" when processing file \"%s\"" % (str(e), file_name))
     finally:
         shutil.rmtree(temp_dir_name)
 
@@ -50,7 +53,7 @@ def get_access_token():
     with open(ACCESS_TOKEN_FILE, "r") as f:
         token = f.readline()
 
-    return token
+    return token.strip()
 
 def files_to_sync(sync_file):
     """ Given a text file containing paths to files to sync, loads the appropriate files.
