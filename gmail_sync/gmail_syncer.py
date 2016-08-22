@@ -3,7 +3,7 @@ from email.mime import base, text, image, audio, multipart
 from apiclient import discovery
 from oauth2client import client, file, tools
 
-CREDENTIALS_FILE = "./credentials.txt"
+CREDENTIALS_FILE = "/home/piyush/Documents/Files/projects/File-Syncer/gmail_sync/credentials.txt"
 CLIENT_SECRETS_FILE = "/home/piyush/Documents/Files/projects/File-Syncer/gmail_sync/client_secrets.json"
 
 def sync(sync_file_path):
