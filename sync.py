@@ -8,13 +8,22 @@ import gmail_sync.gmail_syncer as gml
 sync_file_path = os.path.join(os.getcwd(), "sync_files.txt")
 
 # Dropbox
-dbx.sync(sync_file_path, "sync_files")
+try:
+    dbx.sync(sync_file_path, "sync_files")
+except Exception as e:
+    print("Exception occurred in sync.py while syncing dropbox: \"{0}\"".format(str(e)))
 
 # Google Drive
-drv.sync(sync_file_path, "sync_files")
+try:
+    drv.sync(sync_file_path, "sync_files")
+except Exception as e:
+    print("Exception occurred in sync.py while syncing drive: \"{0}\"".format(str(e)))
 
 # Gmail
-gml.sync(sync_file_path)
+try:
+    gml.sync(sync_file_path)
+except Exception as e:
+    print("Exception occurred in sync.py while syncing gmail: \"{0}\"".format(str(e)))
 
 # Facebook
 pass

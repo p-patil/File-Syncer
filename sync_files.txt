@@ -1,4 +1,0 @@
-/home/piyush/Desktop/NOTES.txt
-/home/piyush/.vimrc
-/home/piyush/Desktop/CASES.txt
-/home/piyush/Documents/Text/goals.txt
