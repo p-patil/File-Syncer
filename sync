@@ -1,11 +1,12 @@
-import os
+#!/usr/bin/python
+
 import dropbox_sync.dropbox_syncer as dbx
 import drive_sync.drive_syncer as drv
 import gmail_sync.gmail_syncer as gml
 
-# TODO implement a verbose mode, by printing current print statements in verbose mode and by adding specific verbose mode print statements
+# TODO implement verbose mode
 
-sync_file_path = os.path.join(os.getcwd(), "sync_files.txt")
+sync_file_path = "/home/piyush/projects/File-Syncer/sync_files.txt"
 
 # Dropbox
 try:
@@ -23,7 +24,7 @@ except Exception as e:
 try:
     gml.sync(sync_file_path)
 except Exception as e:
-    print("Exception occurred in sync.py while syncing gmail: \"{0}\"".format(str(e)))
+    print("Exception occurred in sync.py while syncing gmail: \"%s\"" % str(e))
 
 # Facebook
 pass

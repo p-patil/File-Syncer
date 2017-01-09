@@ -1,12 +1,10 @@
-import sys, os, shutil, filecmp
+import sys, os, shutil, filecmp, time, dropbox
 
-try:
-    import dropbox
-except ImportError:
-    print("Error: Dropbox API not installed. Install with \"pip3 install dropbox\".")
-    sys.exit()
+ACCESS_TOKEN_PATH = "/home/piyush/projects/File-Syncer/dropbox_sync/access_token.txt"
+ERROR_LOG = "/home/piyush/projects/File-Syncer/dropbox_sync/log.txt"
 
-ACCESS_TOKEN_FILE = "/home/piyush/Documents/Files/projects/File-Syncer/dropbox_sync/access_token.txt"
+with open(ERROR_LOG, "a") as f:
+    f.write("Executed at %s on %s\n" % (str(time.strftime("%H:%M:%S")), time.strftime("%d/%m/%Y")))
     
 def sync(sync_file_path, dbx_sync_folder_path):
     """ Given a file containing paths to files to sync and a sync folder in Dropbox to sync into, syncs the files.
@@ -19,13 +17,14 @@ def sync(sync_file_path, dbx_sync_folder_path):
 
     temp_dir_name = os.path.join(os.getcwd(), "downloaded_files_temp")
     if os.path.exists(temp_dir_name):
-        print("Error: directory \"%s\" exists" % temp_dir_name)
+        with open(ERROR_LOG, "a") as f:
+            f.write("Error: directory \"%s\" exists\n" % temp_dir_name)
         sys.exit()
     os.makedirs(temp_dir_name)
 
     try:
         for file_path in files_to_sync(sync_file_path):
-            f = open(file_path, "rb")
+            contents = open(file_path, "rb").read()
             file_name = file_path.split("/")[-1]
 
             try:
@@ -35,11 +34,12 @@ def sync(sync_file_path, dbx_sync_folder_path):
                     
                     if not filecmp.cmp(local_path, file_path):
                         dbx.files_delete(dbx_files[file_name])
-                        dbx.files_upload(f, dbx_files[file_name])
+                        dbx.files_upload(contents, dbx_files[file_name])
                 else:
-                    dbx.files_upload(f, "%s/%s" % (dbx_sync_folder_path, file_name))
+                    dbx.files_upload(contents, "/%s/%s" % (dbx_sync_folder_path, file_name))
             except Exception as e:
-                print("Dropbox: Got exception \"%s\" when processing file \"%s\"" % (str(e), file_name))
+                with open(ERROR_LOG, "a") as f:
+                    f.write("Dropbox: Got exception \"%s\" when processing file \"%s\"\n" % (str(e), file_name))
     finally:
         shutil.rmtree(temp_dir_name)
 
@@ -50,7 +50,7 @@ def get_access_token():
 
     @return str
     """
-    with open(ACCESS_TOKEN_FILE, "r") as f:
+    with open(ACCESS_TOKEN_PATH, "r") as f:
         token = f.readline()
 
     return token.strip()

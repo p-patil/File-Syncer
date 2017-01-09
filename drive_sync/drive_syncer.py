@@ -1,13 +1,12 @@
-import sys, os, shutil, filecmp
+import sys, os, shutil, filecmp, time
+from pydrive.drive import GoogleDrive
+from pydrive.auth import GoogleAuth
 
-try:
-    from pydrive.drive import GoogleDrive
-    from pydrive.auth import GoogleAuth
-except ImportError:
-    print("Module PyDrive is not installed - install with \"pip3 install pydrive\"")
-    sys.exit()
+CREDENTIALS_FILE = "/home/piyush/projects/File-Syncer/drive_sync/credentials.txt"
+ERROR_LOG = "/home/piyush/projects/File-Syncer/drive_sync/log.txt"
 
-CREDENTIALS_FILE = "/home/piyush/Documents/Files/projects/File-Syncer/drive_sync/credentials.txt"
+with open(ERROR_LOG, "a") as f:
+    f.write("Executed at %s on %s\n" % (str(time.strftime("%H:%M:%S")), time.strftime("%d/%m/%Y")))
 
 def sync(sync_file_path, drive_sync_folder_name):
     """ Given a file containing paths to files to sync and a sync folder in Drive to sync into, syncs the files.
@@ -36,7 +35,8 @@ def sync(sync_file_path, drive_sync_folder_name):
 
     temp_dir_name = os.path.join(os.getcwd(), "downloaded_files_temp")
     if os.path.exists(temp_dir_name):
-        print("Error: directory \"%s\" exists" % temp_dir_name)
+        with open("ERROR_LOG", "a") as f:
+            f.write("Error: directory \"%s\" exists\n" % temp_dir_name)
         sys.exit()
     os.makedirs(temp_dir_name)
 
@@ -60,7 +60,8 @@ def sync(sync_file_path, drive_sync_folder_name):
                     new_file.SetContentFile(file_path)
                     new_file.Upload()
             except Exception as e:
-                print("Drive: Got exception \"%s\" when processing file \"%s\"" % (str(e), file_name))
+                with open("ERROR_LOG", "a") as f:
+                    f.write("Drive: Got exception \"%s\" when processing file \"%s\"\n" % (str(e), file_name))
     finally:
         shutil.rmtree(temp_dir_name)
         

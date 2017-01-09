@@ -1,0 +1,14 @@
+Executed at 23:42:11 on 08/01/2017
+Dropbox: Got exception "'sync_files/NOTES.txt' did not match pattern '(/(.|[\r\n])*)|(ns:[0-9]+(/.*)?)'" when processing file "NOTES.txt"
+Dropbox: Got exception "'sync_files/.vimrc' did not match pattern '(/(.|[\r\n])*)|(ns:[0-9]+(/.*)?)'" when processing file ".vimrc"
+Dropbox: Got exception "'sync_files/inventory.txt' did not match pattern '(/(.|[\r\n])*)|(ns:[0-9]+(/.*)?)'" when processing file "inventory.txt"
+Executed at 23:43:10 on 08/01/2017
+Dropbox: Got exception "expected request_binary as binary type, got <class '_io.BufferedReader'>" when processing file "NOTES.txt"
+Dropbox: Got exception "expected request_binary as binary type, got <class '_io.BufferedReader'>" when processing file ".vimrc"
+Dropbox: Got exception "expected request_binary as binary type, got <class '_io.BufferedReader'>" when processing file "inventory.txt"
+Executed at 23:47:32 on 08/01/2017
+Executed at 23:48:55 on 08/01/2017
+Executed at 23:49:51 on 08/01/2017
+Executed at 23:51:34 on 08/01/2017
+Executed at 23:51:40 on 08/01/2017
+Executed at 23:54:47 on 08/01/2017
