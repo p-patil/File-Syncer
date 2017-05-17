@@ -8,13 +8,17 @@ ERROR_LOG = "/home/piyush/projects/File-Syncer/drive_sync/log.txt"
 with open(ERROR_LOG, "a") as f:
     f.write("Executed at %s on %s\n" % (str(time.strftime("%H:%M:%S")), time.strftime("%d/%m/%Y")))
 
-def sync(sync_file_path, drive_sync_folder_name):
+def sync(sync_file_path, drive_sync_folder_name, verbose = False):
     """ Given a file containing paths to files to sync and a sync folder in Drive to sync into, syncs the files.
     
     @param sync_file_path: str
     @param dbx_sync_folder_path: str
     """
+    if verbose: print("Reading credentials from file \"%s\"" % CREDENTIALS_FILE)
+
     drive = GoogleDrive(authenticate(CREDENTIALS_FILE))
+
+    if verbose: print("Reading drive files")
 
     # Locate sync folder by ID
     sync_file_id = None
@@ -40,6 +44,8 @@ def sync(sync_file_path, drive_sync_folder_name):
         sys.exit()
     os.makedirs(temp_dir_name)
 
+    print("Syncing files")
+
     try:
         for file_path in files_to_sync(sync_file_path):
             file_name = file_path.split("/")[-1]
@@ -50,12 +56,17 @@ def sync(sync_file_path, drive_sync_folder_name):
                     drive_files[file_name].GetContentFile(local_path)
 
                     if not filecmp.cmp(local_path, file_path):
+                        if verbose: print("Uploading file \"%s\"" % file_name)
+
                         drive_files[file_name].Delete()
 
                         new_file = drive.CreateFile({"title": file_name, "parents": [{"kind": "drive#fileLink", "id": sync_file_id}]})
                         new_file.SetContentFile(file_path)
                         new_file.Upload()
+                    elif verbose: print("Skipping file \"%s\"" % file_name)
                 else:
+                    if verbose: print("Uploading file \"%s\"" % file_name)
+
                     new_file = drive.CreateFile({"title": file_name, "parents": [{"kind": "drive#fileLink", "id": sync_file_id}]})
                     new_file.SetContentFile(file_path)
                     new_file.Upload()
@@ -63,6 +74,8 @@ def sync(sync_file_path, drive_sync_folder_name):
                 with open("ERROR_LOG", "a") as f:
                     f.write("Drive: Got exception \"%s\" when processing file \"%s\"\n" % (str(e), file_name))
     finally:
+        if verbose: print("Cleaning up")
+
         shutil.rmtree(temp_dir_name)
         
 def authenticate(credentials_file):

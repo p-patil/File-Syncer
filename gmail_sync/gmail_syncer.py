@@ -10,11 +10,13 @@ ERROR_LOG = "/home/piyush/projects/File-Syncer/gmail_sync/log.txt"
 with open(ERROR_LOG, "a") as f:
     f.write("Executed at %s on %s\n" % (str(time.strftime("%H:%M:%S")), time.strftime("%d/%m/%Y")))
 
-def sync(sync_file_path):
+def sync(sync_file_path, verbose = False):
     """ Given a file containing paths to files to sync and a sync folder in Dropbox to sync into, syncs the files.
     
     @param sync_file_path: str
     """
+    if verbose: print("Reading credentials from file \"%s\"" % CREDENTIALS_FILE)
+
     # Initialize the authenticated service
     credentials = get_credentials(CREDENTIALS_FILE)
     authorized_http = credentials.authorize(httplib2.Http())
@@ -28,6 +30,8 @@ def sync(sync_file_path):
             return
     os.makedirs(temp_dir_name)
 
+    if verbose: print("Syncing files")
+
     try:
         for file_path in files_to_sync(sync_file_path):
             file_name = file_path.split("/")[-1]
@@ -39,10 +43,15 @@ def sync(sync_file_path):
                 local_path, email = download_corresponding_attachment(gmail_service, body, file_name, temp_dir_name)
                 if local_path is not None: # Email with corresponding attachment exists
                     if not file_compare(local_path, file_path):
+                        if verbose: print("Uploading file \"%s\"" % file_name)
+
                         delete_email(gmail_service, email["id"])
                         send_email(gmail_service, to_addr, from_addr, subject, body, file_path, file_name)
                         mark_unread(gmail_service, body)
+                    elif verbose: print("Skipping file \"%s\"" % file_name)
                 else:
+                    if verbose: print("Uploading file \"%s\"" % file_name)
+
                     # Not found
                     send_email(gmail_service, to_addr, from_addr, subject, body, file_path, file_name)
                     mark_unread(gmail_service, subject)
@@ -50,6 +59,8 @@ def sync(sync_file_path):
                 with open(ERROR_LOG, "a") as f:
                     f.write("Gmail: Got exception \"%s\" when processing file \"%s\"\n" % (str(e), file_name))
     finally:
+        if verbose: print("Cleaning up")
+
         shutil.rmtree(temp_dir_name)
 
 # Helper functions below

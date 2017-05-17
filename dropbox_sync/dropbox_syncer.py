@@ -6,12 +6,16 @@ ERROR_LOG = "/home/piyush/projects/File-Syncer/dropbox_sync/log.txt"
 with open(ERROR_LOG, "a") as f:
     f.write("Executed at %s on %s\n" % (str(time.strftime("%H:%M:%S")), time.strftime("%d/%m/%Y")))
     
-def sync(sync_file_path, dbx_sync_folder_path):
+def sync(sync_file_path, dbx_sync_folder_path, verbose = False):
     """ Given a file containing paths to files to sync and a sync folder in Dropbox to sync into, syncs the files.
     
     @param sync_file_path: str
     @param dbx_sync_folder_path: str
     """
+    if verbose:
+        print("Reading access token from file \"%s\"" % ACCESS_TOKEN_PATH)
+        print("Reading files in dropbox account")
+
     dbx = dropbox.Dropbox(get_access_token())
     dbx_files = {f.name: f.path_display for f in dbx.files_list_folder("/%s/" % dbx_sync_folder_path, recursive = True).entries}
 
@@ -21,6 +25,8 @@ def sync(sync_file_path, dbx_sync_folder_path):
             f.write("Error: directory \"%s\" exists\n" % temp_dir_name)
         sys.exit()
     os.makedirs(temp_dir_name)
+
+    if verbose: print("Syncing files")
 
     try:
         for file_path in files_to_sync(sync_file_path):
@@ -33,14 +39,21 @@ def sync(sync_file_path, dbx_sync_folder_path):
                     dbx.files_download_to_file(local_path, dbx_files[file_name])
                     
                     if not filecmp.cmp(local_path, file_path):
+                        if verbose: print("Uploading file \"%s\"" % file_name)
+
                         dbx.files_delete(dbx_files[file_name])
                         dbx.files_upload(contents, dbx_files[file_name])
+                    elif verbose: print("Skipping file \"%s\"" % file_name)
                 else:
+                    if verbose: print("Uploading file \"%s\"" % file_name)
+
                     dbx.files_upload(contents, "/%s/%s" % (dbx_sync_folder_path, file_name))
             except Exception as e:
                 with open(ERROR_LOG, "a") as f:
                     f.write("Dropbox: Got exception \"%s\" when processing file \"%s\"\n" % (str(e), file_name))
     finally:
+        if verbose: print("Cleaning up")
+
         shutil.rmtree(temp_dir_name)
 
 # Helper functions below
