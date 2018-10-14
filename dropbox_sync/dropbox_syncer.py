@@ -1,14 +1,14 @@
 import sys, os, shutil, filecmp, time, dropbox
 
-ACCESS_TOKEN_PATH = "/home/piyush/projects/File-Syncer/dropbox_sync/access_token.txt"
+ACCESS_TOKEN_PATH = "/home/piyush/projects/File-Syncer/dropbox_sync/authentication/access_token.txt"
 ERROR_LOG = "/home/piyush/projects/File-Syncer/dropbox_sync/log.txt"
 
 with open(ERROR_LOG, "a") as f:
     f.write("Executed at %s on %s\n" % (str(time.strftime("%H:%M:%S")), time.strftime("%d/%m/%Y")))
-    
+
 def sync(sync_file_path, dbx_sync_folder_path, verbose = False):
     """ Given a file containing paths to files to sync and a sync folder in Dropbox to sync into, syncs the files.
-    
+
     @param sync_file_path: str
     @param dbx_sync_folder_path: str
     """
@@ -37,7 +37,7 @@ def sync(sync_file_path, dbx_sync_folder_path, verbose = False):
                 if file_name in dbx_files:
                     local_path = os.path.join(temp_dir_name, file_name)
                     dbx.files_download_to_file(local_path, dbx_files[file_name])
-                    
+
                     if not filecmp.cmp(local_path, file_path):
                         if verbose: print("Uploading file \"%s\"" % file_name)
 

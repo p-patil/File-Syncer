@@ -2,7 +2,7 @@ import sys, os, shutil, filecmp, time
 from pydrive.drive import GoogleDrive
 from pydrive.auth import GoogleAuth
 
-CREDENTIALS_FILE = "/home/piyush/projects/File-Syncer/drive_sync/credentials.txt"
+CREDENTIALS_FILE = "/home/piyush/projects/File-Syncer/drive_sync/authentication/credentials.txt"
 ERROR_LOG = "/home/piyush/projects/File-Syncer/drive_sync/log.txt"
 
 with open(ERROR_LOG, "a") as f:
@@ -10,7 +10,7 @@ with open(ERROR_LOG, "a") as f:
 
 def sync(sync_file_path, drive_sync_folder_name, verbose = False):
     """ Given a file containing paths to files to sync and a sync folder in Drive to sync into, syncs the files.
-    
+
     @param sync_file_path: str
     @param dbx_sync_folder_path: str
     """

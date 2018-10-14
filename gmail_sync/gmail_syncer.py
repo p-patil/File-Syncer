@@ -3,16 +3,17 @@ from email.mime import base, text, image, audio, multipart
 from apiclient import discovery
 from oauth2client import client, file, tools
 
-CREDENTIALS_FILE = "/home/piyush/projects/File-Syncer/gmail_sync/credentials.txt"
-CLIENT_SECRETS_FILE = "/home/piyush/projects/File-Syncer/gmail_sync/client_secrets.json"
-ERROR_LOG = "/home/piyush/projects/File-Syncer/gmail_sync/log.txt"
+CREDENTIALS_FILE = "./authentication/credentials.txt"
+CLIENT_SECRETS_FILE = "./authentication/client_secrets.json"
+ERROR_LOG = "./log.txt"
 
-with open(ERROR_LOG, "a") as f:
-    f.write("Executed at %s on %s\n" % (str(time.strftime("%H:%M:%S")), time.strftime("%d/%m/%Y")))
+# TODO(piyush) uncomment
+# with open(ERROR_LOG, "a") as f:
+    # f.write("Executed at %s on %s\n" % (str(time.strftime("%H:%M:%S")), time.strftime("%d/%m/%Y")))
 
 def sync(sync_file_path, verbose = False):
     """ Given a file containing paths to files to sync and a sync folder in Dropbox to sync into, syncs the files.
-    
+
     @param sync_file_path: str
     """
     if verbose: print("Reading credentials from file \"%s\"" % CREDENTIALS_FILE)
@@ -68,7 +69,7 @@ def sync(sync_file_path, verbose = False):
 def download_corresponding_attachment(service, query, file_name, storage_path):
     """ Given an email service and email query, searches the inbox for the given email and downloads the
     specified file attachment of the email to the specified storage path.
-    
+
     @param service: Service
     @param query: str
     @param file_name: str
@@ -110,15 +111,15 @@ def download_corresponding_attachment(service, query, file_name, storage_path):
 
 def delete_email(service, email_id):
     """ Deletes the email with the specified ID from the inbox of the given email service.
-    
+
     @param service: Service
     @param email_id: str
     """
     service.users().messages().trash(userId = "me", id = email_id).execute()
-    
-def send_email(service, to_addr, from_addr, subject, message_body, attachment_file_path, attachment_file_name):
+
+def send_email(service, to_addr, from_addr, subject, message_body, attachment_file_path=None, attachment_file_name=None):
     """ Given an email service, sends an email.
-    
+
     @param service: Service
     @param to_addr: str
     @param from_addr: str
@@ -156,8 +157,9 @@ def send_email(service, to_addr, from_addr, subject, message_body, attachment_fi
             attachment.set_payload(afp.read())
 
     # Attach
-    attachment.add_header("Content-Disposition", "attachment", filename = attachment_file_name)
-    message.attach(attachment)
+    if attachment_file_path is not None and attachment_file_name is not None:
+        attachment.add_header("Content-Disposition", "attachment", filename = attachment_file_name)
+        message.attach(attachment)
 
     # Send
     body = {"raw": base64.urlsafe_b64encode(message.as_bytes()).decode()}
@@ -165,7 +167,7 @@ def send_email(service, to_addr, from_addr, subject, message_body, attachment_fi
 
 def mark_unread(service, query):
     """ Given an email service, searches the inbox for emails matching the given query and marks them as unread.
-    
+
     @param service: Service
     @param query: str
     """
@@ -179,7 +181,7 @@ def mark_unread(service, query):
 
 def most_recent_email(service, query, file_name = None):
     """ Given an email service, searches its inbox for an email matching the query and returns the most recent match.
-    
+
     @param service: Service
     @param query: str
     @param file_name: str
@@ -204,9 +206,9 @@ def most_recent_email(service, query, file_name = None):
 
 def get_credentials(credentials_file):
     """ Loads OAuth credentials from the stored credentials file.
-    
+
     @param credentials_file: str
-    
+
     @return Credentials
     """
     storage = file.Storage(credentials_file) # Cache for authentication token
@@ -228,18 +230,18 @@ def get_credentials(credentials_file):
 
 def files_to_sync(sync_file):
     """ Parses the sync file into a list of file names.
-    
+
     @param sync_file: str
-    
+
     @return list(str)
     """
     return [line.strip() for line in open(sync_file, "r")]
 
 def remove_extension(name):
     """ Removes the extension from a file name.
-    
+
     @param name: str
-    
+
     @return str
     """
     if "." in name:
@@ -249,10 +251,10 @@ def remove_extension(name):
 
 def file_compare(path1, path2):
     """ Compares if two files are equal.
-    
+
     @param path1: str
     @param path2: str
-    
+
     @return bool
     """
     buffer_size = 1024

@@ -1,19 +1,4 @@
 sync_files.txt
 
-dropbox_sync/__pycache__
-dropbox_sync/__pycache__/*
-dropbox_sync/access_token.txt
-
-drive_sync/__pycache__
-drive_sync/__pycache__/*
-drive_sync/client_secrets.json
-drive_sync/credentials.json
-drive_sync/credentials.txt
-
-gmail_sync/__pycache__
-gmail_sync/__pycache__/*
-gmail_sync/client_secrets.json
-gmail_sync/credentials.txt
-
-fb_sync/__pycache__
-fb_sync/__pycache__/*
+**/authentication
+**/__pycache__
